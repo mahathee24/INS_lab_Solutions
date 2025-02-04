@@ -40,6 +40,7 @@ iswewishstoreplaceletter
 The encrypted text is fbqyjfbeclaymiuwyiiyccya
 The original text is iswewishstoreplaceletter
 ```
+#[Run on Google Colab]"(https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO?usp=sharing)"
 
 ## Screenshot of implementation and Output
 
