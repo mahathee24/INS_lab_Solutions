@@ -16,82 +16,105 @@ This hybrid approach provides stronger encryption by combining both substitution
     import string
      import numpy as np
 
-# Helper function to generate a secure random keystream
-     def generate_keystream(length):
-    return [random.randint(0, 255) for _ in range(length)]
+This function decrypts the ciphertext that was encrypted using the Vigenère cipher with the same key.
 
-# Substitution Step: Vigenère-like encryption (Byte-wise)
-    def vigenere_encrypt(plaintext, keystream):
-    return bytes([(ord(plaintext[i]) + keystream[i]) % 256 for i in range(len(plaintext))])
-
-    def vigenere_decrypt(ciphertext, keystream):
-    return ''.join([chr((ciphertext[i] - keystream[i]) % 256) for i in range(len(ciphertext))])
-
-# Transposition Step: Columnar Transposition Cipher
-    def columnar_transposition_encrypt(text, key):
-    num_cols = len(key)
-    num_rows = -(-len(text) // num_cols)  # Ceiling division
-    matrix = [['' for _ in range(num_cols)] for _ in range(num_rows)]
-
-    # Fill the matrix row-wise
-    index = 0
-    for i in range(num_rows):
-        for j in range(num_cols):
-            if index < len(text):
-                matrix[i][j] = text[index]
-                index += 1
-
-    # Read columns in key order
-    sorted_key = sorted(list(enumerate(key)), key=lambda x: x[1])
-    encrypted_text = ''.join(matrix[row][col[0]] for col in sorted_key for row in range(num_rows) if matrix[row][col[0]])
-    return encrypted_text
-
-
-    def columnar_transposition_decrypt(text, key):
+    def vigenere_decrypt(ciphertext, key):
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    key = key.upper()
+    ciphertext = ciphertext.upper().replace(" ", "")
+    plain_text = ""
+    key_index = 0
     
+    for char in ciphertext:
+        if char in alphabet:
+            shift = alphabet.index(key[key_index % len(key)])
+            plain_text += alphabet[(alphabet.index(char) - shift) % len(alphabet)]
+            key_index += 1
+        else:
+            plain_text += char
+    
+    return plain_text
+
+
+3. Columnar Transposition Cipher Encryption (columnar_transposition_encrypt)
+This function encrypts a message using the Columnar Transposition Cipher, which rearranges the characters of the plaintext into a grid and reads them by columns.
+
+
+        def columnar_transposition_encrypt(plaintext, key):
+        num_cols = len(key)
+        num_rows = len(plaintext) // num_cols + (1 if len(plaintext) % num_cols else 0)
+     
+        grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+       for i, char in enumerate(plaintext):
+        row = i // num_cols
+        col = i % num_cols
+        grid[row][col] = char
+    
+       key_order = sorted(range(len(key)), key=lambda x: key[x])
+       ciphertext = ''.join(''.join(grid[row][col] for row in range(num_rows) if grid[row][col] != '') for col in key_order)
+    
+       return ciphertext
+Explanation:
+Input: plaintext (the message to be encrypted), key (the keyword used to determine the column order)
+The plaintext is written into a grid with a number of columns equal to the length of the key. If the grid doesn't fill up, empty spaces are left.
+The ciphertext is formed by reading the grid column by column in the order determined by the keyword.
+Output: The columnar-transposed ciphertext.
+
+# 4. Columnar Transposition Cipher Decryption (columnar_transposition_decrypt)
+This function decrypts the message encrypted using the Columnar Transposition Cipher by reversing the transposition process.
+
+    def columnar_transposition_decrypt(ciphertext, key):
     num_cols = len(key)
-    num_rows = -(-len(text) // num_cols)  # Ceiling division
-    matrix = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+    num_rows = len(ciphertext) // num_cols
+    
+    key_order = sorted(range(len(key)), key=lambda x: key[x])
+    grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+    
+    idx = 0
+    for col in key_order:
+        for row in range(num_rows):
+            if idx < len(ciphertext):
+                grid[row][col] = ciphertext[idx]
+                idx += 1
+    
+    plaintext = ''.join(''.join(grid[row][col] for col in range(num_cols)) for row in range(num_rows))
+    return plaintext.strip()
+Explanation:
+Input: ciphertext (the encrypted message), key (the same key used for encryption)
+The ciphertext is rearranged into a grid based on the number of columns, and the grid is filled by columns in the order determined by the key.
+After reconstructing the grid, the plaintext is read row by row.
 
-    sorted_key = sorted(list(enumerate(key)), key=lambda x: x[1])
-    col_lengths = [num_rows] * (len(text) % num_cols) + [num_rows - 1] * (num_cols - len(text) % num_cols)
+5. Hybrid Encryption (hybrid_encrypt)
+This function applies both the Vigenère Cipher and Columnar Transposition Cipher to encrypt the plaintext message.
 
-    # Fill the matrix column-wise
-    index = 0
-    for col, _ in sorted_key:
-        for row in range(col_lengths[col]):
-            if index < len(text):
-                matrix[row][col] = text[index]
-                index += 1
 
-    # Read row-wise to decrypt
-    decrypted_text = ''.join(matrix[row][col] for row in range(num_rows) for col in range(num_cols) if matrix[row][col])
-    return decrypted_text
+       def hybrid_encrypt(plaintext, vigenere_key, columnar_key):
+       vigenere_encrypted = vigenere_encrypt(plaintext, vigenere_key)
+       columnar_encrypted = columnar_transposition_encrypt(vigenere_encrypted, columnar_key)
+       return columnar_encrypted
+Explanation:
+Input: plaintext (the original message), vigenere_key (key for Vigenère cipher), columnar_key (key for Columnar Transposition cipher)
+First, the plaintext is encrypted using the Vigenère cipher.
+Then, the Vigenère-encrypted text is passed through the Columnar Transposition cipher to further encrypt the message.
 
-# Hybrid Encryption
-    def hybrid_encrypt(plaintext, transposition_key):
-    keystream = generate_keystream(len(plaintext))
-    substituted_text = vigenere_encrypt(plaintext, keystream)
-    transposed_text = columnar_transposition_encrypt(substituted_text.decode('latin-1'), transposition_key)
-    return transposed_text, keystream
+# Hybrid Decryption (hybrid_decrypt)
+This function decrypts the message that was encrypted using both the Vigenère Cipher and Columnar Transposition Cipher.
 
-# Hybrid Decryption
-    def hybrid_decrypt(ciphertext, keystream, transposition_key):
-    transposed_text = columnar_transposition_decrypt(ciphertext, transposition_key)
-    original_text = vigenere_decrypt(transposed_text.encode('latin-1'), keystream)
-    return original_text
 
-# Example Usage
-    plaintext = "HYBRIDCIPHERSARESECURE!"
-    transposition_key = "SECURITY"
+    def hybrid_decrypt(ciphertext, vigenere_key, columnar_key):
+    columnar_decrypted = columnar_transposition_decrypt(ciphertext, columnar_key)
+    vigenere_decrypted = vigenere_decrypt(columnar_decrypted, vigenere_key)
+    return vigenere_decrypted
+Explanation:
+Input: ciphertext (the encrypted message), vigenere_key (key for Vigenère cipher), columnar_key (key for Columnar Transposition cipher)
+First, the ciphertext is decrypted using the Columnar Transposition cipher.
+Then, the result is decrypted using the Vigenère cipher to retrieve the original plaintext.
+Output: The original plaintext message after decryption.
 
-# Encrypt
-     encrypted_text, keystream = hybrid_encrypt(plaintext, transposition_key)
-    print("Encrypted Text:", encrypted_text)
 
-# Decrypt
-    decrypted_text = hybrid_decrypt(encrypted_text, keystream, transposition_key)
-    print("Decrypted Text:", decrypted_text)
+Conclusion:
+This script implements a hybrid encryption technique that first encrypts the message using the Vigenère Cipher and then applies the Columnar Transposition Cipher. The decryption process reverses both steps to retrieve the original message.
+
 
 
 task 1 code  in google collab:-(https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO#scrollTo=zMSreJIiZ9fs)
