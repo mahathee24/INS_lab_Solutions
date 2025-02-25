@@ -33,4 +33,4 @@ Steps:
    After the Feistel rounds, the final binary string is padded with leading zeros (if necessary) to ensure its length is a multiple of 8 bits.
         The binary string is then converted back to text by grouping every 8 bits and converting each group into the corresponding ASCII character.
 
-        Run this implementation live on Google Colab:https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO?usp=sharing#scrollTo=6vKWCQAobXYg
+   Run this implementation live on Google Colab:https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO?usp=sharing#scrollTo=6vKWCQAobXYg
