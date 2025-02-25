@@ -17,3 +17,8 @@ for i in ciphertext:
             originalText+=alpha[keys.index(j)]
 
 print(f"The original text is {originalText}")
+for i in ciphertext:
+    for j in keys:
+        if i == j:
+            originalText += alpha[keys.index(j)]
+print(f"The decrypted text is {originalText}")
