@@ -20,3 +20,6 @@ Output:
 
     The public keys of Alice and Bob are displayed.
     The shared secret keys of Alice and Bob are printed. Both keys (Ka and Kb) should be identical if the algorithm is executed correctly.
+Run this implementation live on Google Colab            
+                
+                 https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO?usp=sharing#scrollTo=6vKWCQAobXYg
