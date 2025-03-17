@@ -24,3 +24,5 @@ Functions:
     ecc_encryption(): Placeholder function for encryption logic (not yet implemented).
     ecc_decryption(): Placeholder function for decryption logic (not yet implemented).
 Note: The actual implementation of elliptic curve operations is more complex and requires working with elliptic curve points, but this simplified version uses basic integer multiplication for demonstration purposes.
+
+Run this implementation live on Google Colab:https://colab.research.google.com/drive/1Q0JFUI6yM1ouSdsc6MGaA0FouB4Zn5hO?usp=sharing#scrollTo=6vKWCQAobXYg
