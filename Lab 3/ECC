@@ -1,0 +1,27 @@
+def generate_secretkey_userA (pub_key_B, na):
+return pub_key_B * na
+
+def generate_secretkey_userB(pub_key_A, nb):
+return pub_key_A * nb
+
+def ecc_encryption ():
+pass
+
+def ecc_decryption ():
+pass
+
+def main():
+# na = 12
+# nb = 24
+# G = 14
+na=int(input("Enter private Key of A:"))
+nb=int(input("Enter private Key of B:"))
+G=int(input("Enter value of G:"))
+publickey_a = G * na
+publickey_b = G * nb
+SecretKey_a = generate_secretkey_userA(publickey_a, na)
+SecretKey_b = generate_secretkey_userB(publickey_b, nb)
+print("Secret key of a", SecretKey_a)
+print("Secret key of b", SecretKey_b)
+
+main()
